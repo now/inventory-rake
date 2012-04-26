@@ -1,0 +1,26 @@
+                                Inventory-Rake
+
+  Inventory-Rake provides Rake tasks for your Inventory¹.  This includes
+  cleaning tasks, gem generation, testing, installation, uninstallation, and
+  pushing, and inventory content checking.
+
+¹ Get information on Inventory at http://disu.se/software/inventory/
+
+§ Installation
+
+    Install Inventory-Rake with
+
+    % gem install inventory-rake
+
+§ Usage
+
+    Include the following code in your ‹Rakefile›, where ‹Package› is the
+    top-level module of your package:
+
+      require 'inventory/rake-3.0'
+
+      Inventory::Rake::Tasks.define Package::Version, :gem => proc{ |_, s|
+        s.author = 'Your Name'
+        s.email = 'your@email.com'
+        s.homepage = 'https://github.com/now/%s' % Package.name.downcase
+      }

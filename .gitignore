@@ -1,0 +1,5 @@
+*.gem
+*.gemspec
+doc/
+.yardoc/
+.yardopts
