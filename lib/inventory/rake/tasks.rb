@@ -15,5 +15,13 @@ module Inventory::Rake::Tasks
       Inventory.new(:inventory => inventory)
       Gem.new(:inventory => inventory, &(options.fetch(:gem, proc{ })))
     end
+
+    def unless_installing_dependencies
+      yield if (%w'deps:install
+                   deps:install:user
+                   gem:deps:install
+                   gem:deps:install:user' &
+                Rake.application.top_level_tasks).empty?
+    end
   end
 end

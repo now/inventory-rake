@@ -3,9 +3,11 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 2, 0){
+  Version = Inventory.new(1, 3, 0){
     def dependencies
       super + Inventory::Dependencies.new{
+        development 'lookout', 3, 0, 0
+        development 'lookout-rake', 3, 0, 0
         optional 'rake', 0, 9, 2
       }
     end
