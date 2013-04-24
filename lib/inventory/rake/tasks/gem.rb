@@ -1,8 +1,30 @@
 # -*- coding: utf-8 -*-
 
+# Defines [RubyGems](http://rubygems.org/)-related tasks.  This includes tasks
+# for generating a gem specification, creating a gem file, checking the gem
+# file before distribution, installing gem dependencies, installing and
+# uninstalling the gem locally, and pushing the gem to a distribution point.
 class Inventory::Rake::Tasks::Gem
   include Rake::DSL
 
+  # Sets up tasks based on INVENTORY and SPECIFICATION, optionally yields the
+  # task object and the gem specification for further customization, then
+  # {#define}s the tasks.
+  #
+  # The default for SPECIFICATION is to use the name, version, and files of the
+  # inventory, use all of `README` as the description, set the summary to the
+  # first sentence of the description, set the require paths to “lib”, add each
+  # extension of the inventory’s extconf to the extensions, and finally add
+  # inventory’s dependencies.
+  #
+  # @param [Hash] options
+  # @option options [Inventory] :inventory (Inventory::Rake::Tasks.inventory)
+  #   The inventory to use
+  # @option options [Gem::Specification] :specification The specification to
+  #   use
+  # @yield [?]
+  # @yieldparam [self] task
+  # @yieldparam [Gem::Specification] specification
   def initialize(options = {})
     self.inventory = options.fetch(:inventory, Inventory::Rake::Tasks.inventory)
     self.specification = options.fetch(:specification,
@@ -19,12 +41,94 @@ class Inventory::Rake::Tasks::Gem
 
                                          s.require_paths = @inventory.lib_directories
 
+                                         s.extensions = @inventory.extensions.map(&:extconf)
+
                                          @inventory.dependencies.add_to_gem_specification s
                                        })
     yield self, @specification if block_given?
     define
   end
 
+  # Defines the following tasks:
+  #
+  # <dl>
+  #   <dt>spec</dt>
+  #   <dd>Create specifications; depends on gem:spec.</dd>
+  #
+  #   <dt>gem:spec</dt>
+  #   <dd>Create gem specification; depends on <em>gemspec</em>.</dd>
+  #
+  #   <dt>gemspec (file)</dt>
+  #   <dd>Gem specification file; depends on Rakefile, README, and inventory
+  #   path.</dd>
+  #
+  #   <dt>dist</dt>
+  #   <dd>Create files for distribution; depends on gem:dist.</dd>
+  #
+  #   <dt>gem:dist</dt>
+  #   <dd>Create gem for distribution; depends on inventory:check and
+  #   <em>gem</em> file.</dd>
+  #
+  #   <dt>gem (file)</dt>
+  #   <dd>Gem file; depends on files included in gem.</dd>
+  #
+  #   <dt>dist:check</dt>
+  #   <dd>Check files before distribution; depends on dist and
+  #   gem:dist:check.</dd>
+  #
+  #   <dt>gem:dist:check</dt>
+  #   <dd>Check gem before distribution; depends on gem:dist.</dd>
+  #
+  #   <dt>deps:install</dt>
+  #   <dd>Install dependencies on the local system; depends on
+  #   gem:deps:install.</dd>
+  #
+  #   <dt>gem:deps:install</dt>
+  #   <dd>Install dependencies in ruby gem directory.</dd>
+  #
+  #   <dt>deps:install:user</dt>
+  #   <dd>Install dependencies for the current user; depends on
+  #   gem:deps:install:user.</dd>
+  #
+  #   <dt>gem:deps:install:user</dt>
+  #   <dd>Install dependencies in the user gem directory.</dd>
+  #
+  #   <dt>install</dt>
+  #   <dd>Install distribution files on the local system; depends on
+  #   gem:install.</dd>
+  #
+  #   <dt>gem:install</dt>
+  #   <dd>Install <em>gem</em> in ruby gem directory; depends on gem:dist.</dd>
+  #
+  #   <dt>install:user</dt>
+  #   <dd>Install distribution files for the current user; depends on
+  #   gem:install:user.</dd>
+  #
+  #   <dt>gem:install:user</dt>
+  #   <dd>Install <em>gem</em> in the user gem directory.</dd>
+  #
+  #   <dt>uninstall</dt>
+  #   <dd>Delete all files installed on the local system.</dd>
+  #
+  #   <dt>gem:uninstall</dt>
+  #   <dd>Uninstall <em>gem</em> from ruby gem directory.</dd>
+  #
+  #   <dt>uninstall:user</dt>
+  #   <dd>Delete all files installed for current user.</dd>
+  #
+  #   <dt>gem:uninstall:user</dt>
+  #   <dd>Uninstall <em>gem</em> from ruby gem directory.</dd>
+  #
+  #   <dt>push</dt>
+  #   <dd>Push distribution files to distribution hubs.</dd>
+  #
+  #   <dt>gem:push</dt>
+  #   <dd>Push <em>gem</em> to rubygems.org.</dd>
+  # </dl>
+  #
+  # The gemspec will be added to {Inventory::Rake::Tasks.cleanfiles}.
+  #
+  # @return [self]
   def define
     desc 'Create specifications' unless Rake::Task.task_defined? :spec
     task :spec => :'gem:spec'
@@ -54,8 +158,9 @@ class Inventory::Rake::Tasks::Gem
     task :'gem:dist' => [:'inventory:check', @specification.file_name]
     file @specification.file_name => @specification.files do
       require 'rubygems' unless defined? Gem
+      require 'rubygems/package' unless defined? Gem::Package
       rake_output_message 'gem build %s' % gemspec if verbose
-      Gem::Builder.new(@specification).build
+      Gem::Package.build @specification
     end
 
     desc 'Check files before distribution' unless
@@ -96,7 +201,7 @@ class Inventory::Rake::Tasks::Gem
       Rake::Task.task_defined? :'deps:install:user'
     task :'deps:install:user' => :'gem:deps:install:user'
 
-    desc 'Install dependencies for the current user'
+    desc 'Install dependencies in the current user’s ruby gem directory'
     task :'gem:deps:install:user' do
       require 'rubygems' unless defined? Gem
       require 'rubygems/dependency_installer' unless defined? Gem::DependencyInstaller
@@ -185,7 +290,15 @@ class Inventory::Rake::Tasks::Gem
     task :'gem:push' => :'gem:dist:check' do
       sh 'gem push -%s-verbose %s' % [verbose ? '' : '-no', @specification.file_name]
     end
+
+    self
   end
 
-  attr_writer :inventory, :specification
+  # @param [Inventory] value
+  # @return [Inventory] The inventory to use: VALUE
+  attr_writer :inventory
+
+  # @param [Gem::Specification] value
+  # @return [Gem::Specification] The specification to use: VALUE
+  attr_writer :specification
 end

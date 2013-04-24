@@ -1,10 +1,12 @@
                                 Inventory-Rake
 
-  Inventory-Rake provides Rake tasks for your Inventory¹.  This includes
-  cleaning tasks, gem generation, testing, installation, uninstallation, and
-  pushing, and inventory content checking.
+  Inventory-Rake provides Rake¹ tasks for your Inventory².  This includes tasks
+  for cleaning up our project, compiling extensions, installing dependencies,
+  installing and uninstalling the project itself, and creating and pushing
+  distribution files to distribution points.
 
-¹ Get information on Inventory at http://disu.se/software/inventory/
+¹ See http://rake.rubyforge.org/
+² See http://disu.se/software/inventory/
 
 § Installation
 
@@ -15,12 +17,121 @@
 § Usage
 
     Include the following code in your ‹Rakefile›, where ‹Package› is the
-    top-level module of your package:
+    top-level module of your project:
 
-      require 'inventory/rake-3.0'
+      require 'inventory-rake-3.0'
+
+      load File.expand_path('../lib/package/version.rb', __FILE__)
 
       Inventory::Rake::Tasks.define Package::Version, :gem => proc{ |_, s|
         s.author = 'Your Name'
-        s.email = 'your@email.com'
-        s.homepage = 'https://github.com/now/%s' % Package.name.downcase
+        s.email = 'you@example.com'
+        s.homepage = 'http://example.com/'
       }
+
+      Inventory::Rake::Tasks.unless_installing_dependencies do
+        # Any additional tasks that your project’s dependencies provide
+      end
+
+    ‹Inventory::Rake::Tasks.define› does the heavy lifting.  It takes our
+    inventory and sets up the tasks mentioned above.  We also do some
+    additional customization of the gem specification.
+
+    As we want to be able to use our Rakefile to install our dependencies for
+    us, the rest of the Rakefile is inside the conditional
+    #unless_installing_dependencies, which, as the name certainly implies,
+    executes its block unless the task being run is the one that installs our
+    dependencies.  This becomes relevant if we want to, for example, set up
+    Travis¹ integration.  To do so, simply add
+
+      before_script:
+        - gem install inventory-rake -v '~> VERSION' --no-rdoc --no-ri
+        - rake gem:deps:install
+
+    to your ‹.travis.yml› file.  This’ll make sure that Travis installs all
+    development, runtime, and optional dependencies that you’ve listed in your
+    inventory before running any tests.
+
+    There’s more information in the {API documentation}² that you’ll likely
+    want to read up on if anything is unclear.
+
+¹ See http://travis-ci.org/
+² See http://disu.se/software/inventory/api/inventory-rake/
+
+§ Tasks
+
+    The tasks that are created if you use Inventory-Rake are:
+
+  = check. = Check that the package meets its expectations.
+  = mostlyclean. = Delete targets built by rake that are ofter rebuilt.
+  = clean. = Delete targets built by rake; depends on mostlyclean.
+  = distclean. = Delete all files not meant for distribution; depends on clean.
+  = compile. = Compile all extensions; depends on each compile:name.
+  = compile:name. = Compile extension /name/; depends on
+      lib/path/so file.
+  = lib/path/so. = Installed dynamic library of extension /name/ inside
+      inventory path; depends on ext/name/so.
+  = ext/name/so. = Dynamic library of extension /name/; depends on
+      ext/name/Makefile and the source files of the extension.
+  = ext/name/Makefile. = Makefile for extension /name/; depends on inventory
+      path, ext/name/extconf.rb file, and ext/name/depend file.
+  = clean:name. = Clean files built for extension /name/; depended upon by
+      clean.
+  = spec. = Create specifications; depends on gem:spec.
+  = gem:spec. = Create gem specification; depends on gemspec.
+  = gemspec (file). = Gem specification file; depends on Rakefile, README, and
+      inventory path.
+  = dist. = Create files for distribution; depends on gem:dist.
+  = gem:dist. = Create gem for distribution; depends on inventory:check and gem
+      file.
+  = inventory:check. = Check that the inventory is correct by looking for files
+      not listed in the inventory that match the pattern and for files listed
+      in the inventory that don’t exist; depends on distclean.
+  = gem (file). = Gem file; depends on files included in gem.
+  = dist:check. = Check files before distribution; depends on dist and
+      gem:dist:check.
+  = gem:dist:check. = Check gem before distribution; depends on gem:dist.
+  = deps:install. = Install dependencies on the local system; depends on
+      gem:deps:install.
+  = gem:deps:install. = Install dependencies in ruby gem directory.
+  = deps:install:user. = Install dependencies for the current user; depends on
+      gem:deps:install:user.
+  = gem:deps:install:user. = Install dependencies in the user gem directory.
+  = install. = Install distribution files on the local system; depends on
+      gem:install.
+  = gem:install. = Install gem in ruby gem directory; depends on gem:dist.
+  = install:user. = Install distribution files for the current user; depends on
+      gem:install:user.
+  = gem:install:user. = Install gem in the user gem directory.
+  = uninstall. = Delete all files installed on the local system.
+  = gem:uninstall. = Uninstall gem from ruby gem directory.
+  = uninstall:user. = Delete all files installed for current user.
+  = gem:uninstall:user. = Uninstall gem from ruby gem directory.
+  = push. = Push distribution files to distribution hubs.
+  = gem:push. = Push gem to rubygems.org.
+
+§ Financing
+
+    Currently, most of my time is spent at my day job and in my rather busy
+    private life.  Please motivate me to spend time on this piece of software
+    by donating some of your money to this project.  Yeah, I realize that
+    requesting money to develop software is a bit, well, capitalistic of me.
+    But please realize that I live in a capitalistic society and I need money
+    to have other people give me the things that I need to continue living
+    under the rules of said society.  So, if you feel that this piece of
+    software has helped you out enough to warrant a reward, please PayPal a
+    donation to now@disu.se¹.  Thanks!  Your support won’t go unnoticed!
+
+¹ Send a donation:
+  https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=now%40disu%2ese&item_name=Nikolai%20Weibull%20Software%20Services
+
+§ Reporting Bugs
+
+    Please report any bugs that you encounter to the {issue tracker}¹.
+
+  ¹ See https://github.com/now/inventory-rake/issues
+
+§ Authors
+
+    Nikolai Weibull wrote the code, the tests, the manual pages, and this
+    README.

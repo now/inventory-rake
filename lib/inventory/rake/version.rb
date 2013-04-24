@@ -3,29 +3,32 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 3, 0){
+  Version = Inventory.new(1, 4, 0){
     def dependencies
       super + Inventory::Dependencies.new{
         development 'lookout', 3, 0, 0
         development 'lookout-rake', 3, 0, 0
-        optional 'rake', 0, 9, 2
+        development 'yard', 0, 8, 0
+        development 'yard-heuristics', 1, 1, 0
+        runtime 'rake', 0, 9, 2, :feature => 'rake'
       }
     end
 
-    def requires
-      %w'
-        rake
-      '
+    def package_libs
+      %w[tasks.rb
+         tasks/check.rb
+         tasks/clean.rb
+         tasks/compile.rb
+         tasks/gem.rb
+         tasks/inventory.rb]
     end
 
-    def libs
-      %w'
-        inventory/rake/tasks.rb
-        inventory/rake/tasks/check.rb
-        inventory/rake/tasks/clean.rb
-        inventory/rake/tasks/gem.rb
-        inventory/rake/tasks/inventory.rb
-      '
+    def additional_libs
+      super + %w[inventory/rake-1.0.rb]
+    end
+
+    def unit_tests
+      super - %w[inventory/rake-1.0.rb]
     end
   }
 end
