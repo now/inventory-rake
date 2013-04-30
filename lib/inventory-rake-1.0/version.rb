@@ -6,6 +6,7 @@ module Inventory::Rake
   Version = Inventory.new(1, 4, 0){
     def dependencies
       super + Inventory::Dependencies.new{
+        development 'inventory-rake-tasks-yard', 1, 3, 0
         development 'lookout', 3, 0, 0
         development 'lookout-rake', 3, 0, 0
         development 'yard', 0, 8, 0
