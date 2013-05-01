@@ -42,7 +42,11 @@ class Inventory::Rake::Tasks::Compile
   #
   #   <dt>ext/<em>name</em>/Makefile</dt>
   #   <dd>Makefile for extension <em>name</em>; depends on inventory path,
-  #   ext/<em>name</em>/extconf.rb file, and ext/<em>name</em>/depend file.</dd>
+  #   ext/<em>name</em>/extconf.rb file, and ext/<em>name</em>/depend file.
+  #   Will be created by extconf.rb, which may take options from environment
+  #   variable <em>name#upcase</em><code>_EXTCONF_OPTIONS</code> or
+  #   <code>EXTCONF_OPTIONS</code> if defined.</dd>
+  #
   #
   #   <dt>clean:<em>name</em></dt>
   #   <dd>Clean files built for extension <em>name</em>; depended upon by
@@ -76,8 +80,16 @@ class Inventory::Rake::Tasks::Compile
 
       file makefile => [@inventory.path, extension.extconf, extension.depend] do
         Dir.chdir extension.directory do
-          ENV['CFLAGS'] = '-Werror' unless ENV['CFLAGS']
-          ruby File.basename(extension.extconf)
+          options = ENV['%s_EXTCONF_OPTIONS' % extension.to_s.upcase] || ENV['EXTCONF_OPTIONS']
+          file = '%s.options' % File.basename(extension.extconf)
+          write = options
+          options = begin
+                      File.open(file, 'rb', &:read)
+                    rescue Errno::ENOENT
+                      nil
+                    end unless options
+          ruby '%s %s' % [File.basename(extension.extconf), options]
+          File.open(file, 'wb'){ |f| f.write(options) } if write
         end
       end
 

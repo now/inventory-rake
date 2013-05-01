@@ -74,7 +74,9 @@
   = ext/name/so. = Dynamic library of extension /name/; depends on
       ext/name/Makefile and the source files of the extension.
   = ext/name/Makefile. = Makefile for extension /name/; depends on inventory
-      path, ext/name/extconf.rb file, and ext/name/depend file.
+      path, ext/name/extconf.rb file, and ext/name/depend file.  Will be
+      created by extconf.rb, which may take options from environment variable
+      name#upcase_EXTCONF_OPTIONS or ‹EXTCONF_OPTIONS› if defined.
   = clean:name. = Clean files built for extension /name/; depended upon by
       clean.
   = spec. = Create specifications; depends on gem:spec.
