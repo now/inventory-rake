@@ -96,7 +96,7 @@ class Inventory::Rake::Tasks::Compile
       clean_name = :"clean:#{extension}"
       desc 'Clean files built for extension %s' % extension
       task clean_name do
-        sh 'make -C %s %s' % [extension.directory, rule]
+        sh 'make -C %s clean' % extension.directory
       end
 
       task :clean => clean_name
