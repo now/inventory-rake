@@ -50,7 +50,7 @@ class Inventory::Rake::Tasks::Clean
   # Defines the task {#name} that’ll delete {#files}.
   def define
     task name do
-      rm files, :force => true
+      rm files, :force => true unless files.empty?
     end
   end
 
