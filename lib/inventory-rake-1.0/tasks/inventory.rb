@@ -33,10 +33,7 @@ class Inventory::Rake::Tasks::Inventory
   def define
     desc 'Check that the inventory is correct'
     task :'inventory:check' => :distclean do
-      diff = ((Dir[@pattern] -
-               @inventory.extensions.map(&:source_files) -
-               @inventory.lib_files -
-               @inventory.unit_test_files).map{ |e| '%s: file not listed in inventory' % e } +
+      diff = ((Dir[@pattern] - @inventory.files).map{ |e| '%s: file not listed in inventory' % e } +
               @inventory.files.reject{ |e| File.exist? e }.map{ |e| '%s: file listed in inventory does not exist' % e })
       fail diff.join("\n") unless diff.empty?
       # TODO: puts 'inventory checks out' if verbose
