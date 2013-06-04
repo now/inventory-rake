@@ -93,14 +93,14 @@ class Inventory::Rake::Tasks::Compile
         end
       end
 
-      %w[clean distclean].each do |name|
-        clean_name = :"#{name}:#{extension}"
+      %w[clean distclean].each do |cname|
+        clean_name = :"#{cname}:#{extension}"
         desc 'Clean files built for extension %s' % extension
         task clean_name do
-          sh 'make -C %s %s' % [extension.directory, name] if File.exist? makefile
+          sh 'make -C %s %s' % [extension.directory, cname] if File.exist? makefile
         end
 
-        task :"#{name}" => clean_name
+        task :"#{cname}" => clean_name
       end
     end
 
