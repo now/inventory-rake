@@ -3,12 +3,12 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 6, 0){
+  Version = Inventory.new(1, 6, 1){
     authors{
       author 'Nikolai Weibull', 'now@disu.se'
     }
 
-    homepage 'https://github.com/now/inventory-rake'
+    homepage 'http://disu.se/software/inventory-rake'
 
     licenses{
       license 'LGPLv3+',
