@@ -3,7 +3,7 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 6, 2){
+  Version = Inventory.new(1, 6, 3){
     authors{
       author 'Nikolai Weibull', 'now@disu.se'
     }
@@ -22,7 +22,7 @@ module Inventory::Rake
         development 'lookout', 3, 0, 0
         development 'lookout-rake', 3, 1, 0
         development 'yard', 0, 8, 0
-        development 'yard-heuristics', 1, 1, 0
+        development 'yard-heuristics', 1, 2, 0
         runtime 'rake', 10, 0, 0, :feature => 'rake'
       }
     end
