@@ -11,11 +11,11 @@ class Inventory::Rake::Tasks::Gem
   # task object and the gem specification for further customization, then
   # {#define}s the tasks.
   #
-  # The default for SPECIFICATION is to use the name, version, and files of the
-  # inventory, use all of `README` as the description, set the summary to the
-  # first sentence of the description, set the require paths to “lib”, add each
-  # extension of the inventory’s extconf to the extensions, and finally add
-  # inventory’s dependencies.
+  # The default for SPECIFICATION is to use the name, version, authors, email,
+  # homepage, licenses, and files of the inventory, use all of `README` as the
+  # description, set the summary to the first sentence of the description, set
+  # the require paths to “lib”, add each extension of the inventory’s extconf
+  # to the extensions, and finally add inventory’s dependencies.
   #
   # @param [Hash] options
   # @option options [Inventory] :inventory (Inventory::Rake::Tasks.inventory)
@@ -36,6 +36,12 @@ class Inventory::Rake::Tasks::Gem
 
                                          s.description = IO.read('README')
                                          s.summary = s.description[/^.*?\./].lstrip
+
+                                         s.authors = @inventory.authors.map(&:name)
+                                         s.email = @inventory.authors.map(&:email)
+                                         s.homepage = @inventory.homepage
+
+                                         s.licenses = @inventory.licenses.map(&:abbreviation)
 
                                          s.files = @inventory.files # TODO: We can skip #files and rely on #to_a
 
