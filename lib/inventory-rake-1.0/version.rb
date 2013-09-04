@@ -3,7 +3,7 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 6, 1){
+  Version = Inventory.new(1, 6, 2){
     authors{
       author 'Nikolai Weibull', 'now@disu.se'
     }
@@ -18,9 +18,9 @@ module Inventory::Rake
 
     def dependencies
       super + Inventory::Dependencies.new{
-        development 'inventory-rake-tasks-yard', 1, 3, 0
+        development 'inventory-rake-tasks-yard', 1, 4, 0
         development 'lookout', 3, 0, 0
-        development 'lookout-rake', 3, 0, 0
+        development 'lookout-rake', 3, 1, 0
         development 'yard', 0, 8, 0
         development 'yard-heuristics', 1, 1, 0
         runtime 'rake', 10, 0, 0, :feature => 'rake'
