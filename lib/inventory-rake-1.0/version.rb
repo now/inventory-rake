@@ -8,7 +8,7 @@ module Inventory::Rake
       author 'Nikolai Weibull', 'now@disu.se'
     }
 
-    homepage 'http://disu.se/software/inventory-rake'
+    homepage 'http://disu.se/software/inventory-rake/'
 
     licenses{
       license 'LGPLv3+',
