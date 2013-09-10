@@ -6,7 +6,7 @@
   distribution files to distribution points.
 
 ¹ See http://rake.rubyforge.org/
-² See http://disu.se/software/inventory/
+² See http://disu.se/software/inventory-1.0/
 
 § Installation
 
@@ -52,7 +52,7 @@
     want to read up on if anything is unclear.
 
 ¹ See http://travis-ci.org/
-² See http://disu.se/software/inventory/api/inventory-rake/
+² See http://disu.se/software/inventory-rake-1.0/api/Inventory/Rake/
 
 § Tasks
 

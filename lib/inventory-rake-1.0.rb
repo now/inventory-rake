@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Namespace for [Inventory](http://disu.se/software/inventory/).  The bulk of
+# Namespace for [Inventory](http://disu.se/software/inventory-1.0/).  The bulk of
 # the library is in {Rake::Tasks}.
 class Inventory; end
 
