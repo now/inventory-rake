@@ -198,7 +198,10 @@ class Inventory::Rake::Tasks::Gem
       require 'rubygems' unless defined? Gem
       require 'rubygems/dependency_installer' unless defined? Gem::DependencyInstaller
       @specification.dependencies.each do |dependency|
-        rake_output_message "gem install %s -v '%s'" % [dependency.name, dependency.requirement] if verbose
+        next unless Gem::Dependency.new(dependency.name,
+                                        dependency.requirement).matching_specs.empty?
+        rake_output_message "gem install %s -v '%s'" %
+                            [dependency.name, dependency.requirement] if verbose
         Gem::DependencyInstaller.new.install dependency.name, dependency.requirement
       end
     end
@@ -212,6 +215,8 @@ class Inventory::Rake::Tasks::Gem
       require 'rubygems' unless defined? Gem
       require 'rubygems/dependency_installer' unless defined? Gem::DependencyInstaller
       @specification.dependencies.each do |dependency|
+        next unless Gem::Dependency.new(dependency.name,
+                                        dependency.requirement).matching_specs.empty?
         rake_output_message "gem install --user-install --bindir %s %s -v '%s'" %
           [Gem.bindir(Gem.user_dir), dependency.name, dependency.requirement] if verbose
         Gem::DependencyInstaller.
