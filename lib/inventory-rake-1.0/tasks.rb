@@ -5,7 +5,6 @@ module Inventory::Rake::Tasks
   @mostlycleanfiles, @cleanfiles, @distcleanfiles = [], [], []
 
   class << self
-    # @param [Inventory] value
     # @return [Inventory] The default inventory to use for tasks
     attr_accessor :inventory
 

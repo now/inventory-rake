@@ -54,11 +54,9 @@ class Inventory::Rake::Tasks::Clean
     end
   end
 
-  # @param [Symbol] value
   # @return [Symbol] The name of the task
   attr_accessor :name
 
-  # @param [Array<String>] value
   # @return [Array<String>] The files to delete
   attr_accessor :files
 end

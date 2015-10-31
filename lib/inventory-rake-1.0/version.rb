@@ -3,7 +3,7 @@
 require 'inventory-1.0'
 
 module Inventory::Rake
-  Version = Inventory.new(1, 6, 3){
+  Version = Inventory.new(1, 6, 4){
     authors{
       author 'Nikolai Weibull', 'now@disu.se'
     }
